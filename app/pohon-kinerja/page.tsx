@@ -1,21 +1,18 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-
-// Import CSS dan Component
+import { useEffect, useState } from 'react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'; // 1. Import Hooks Next.js
+import apiClient from '../lib/axios';
 import './treeflex.css';
-import PohonNode from '@/components/PohonNode'; // Pastikan path ini benar sesuai struktur folder kamu
-
-// Import Type
+import PohonNode from '@/components/PohonNode';
 import { PohonKinerja, TematikItem } from '@/app/pohon-kinerja/types';
 
-// Konfigurasi Axios Base URL
-const api = axios.create({
-    baseURL: 'http://localhost:8181/kertas-kerja/api/v2'
-});
-
 const PohonKinerjaPage = () => {
+    // Hooks untuk URL Params
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
     // State untuk Dropdown
     const [listTematik, setListTematik] = useState<TematikItem[]>([]);
     const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -25,11 +22,44 @@ const PohonKinerjaPage = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    // 1. Fetch List Tematik saat halaman pertama kali dimuat
+    // -------------------------------------------------------------------------
+    // 1. LOGIC SINKRONISASI URL & STATE
+    // -------------------------------------------------------------------------
+    
+    // Efek: Baca URL saat pertama load atau saat URL berubah (misal user klik back button)
+    useEffect(() => {
+        const pohonIdParam = searchParams.get('pohon_id');
+        if (pohonIdParam) {
+            setSelectedId(Number(pohonIdParam));
+        } else {
+            setSelectedId(null);
+            setTreeData(null);
+        }
+    }, [searchParams]);
+
+    // Fungsi: Update URL saat user memilih dropdown
+    const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newId = e.target.value;
+        const params = new URLSearchParams(searchParams);
+
+        if (newId) {
+            params.set('pohon_id', newId);
+        } else {
+            params.delete('pohon_id');
+        }
+
+        router.replace(`${pathname}?${params.toString()}`);
+    };
+
+    // -------------------------------------------------------------------------
+    // 2. FETCH DATA
+    // -------------------------------------------------------------------------
+
+    // Fetch List Tematik (Dropdown)
     useEffect(() => {
         const fetchTematikList = async () => {
             try {
-                const response = await api.get('/pohon-kinerja/tematik');
+                const response = await apiClient.get('/pohon-kinerja/tematik');
                 if (response.data.success) {
                     setListTematik(response.data.data);
                 }
@@ -38,21 +68,19 @@ const PohonKinerjaPage = () => {
                 setError("Gagal memuat daftar pohon.");
             }
         };
-
         fetchTematikList();
     }, []);
 
-    // 2. Fetch Detail Pohon saat user memilih ID dari dropdown
+    // Fetch Detail Pohon (Setiap kali selectedId berubah dari URL)
     useEffect(() => {
-        if (!selectedId) return; // Jangan fetch kalau belum ada yang dipilih
+        if (!selectedId) return; 
 
         const fetchTreeDetail = async () => {
             setLoading(true);
             setError(null);
-            setTreeData(null); // Reset tree lama biar tidak bingung
-
+            
             try {
-                const response = await api.get(`/pohon-kinerja/${selectedId}`);
+                const response = await apiClient.get(`/pohon-kinerja/${selectedId}`);
                 if (response.data.success) {
                     setTreeData(response.data.data);
                 } else {
@@ -67,7 +95,7 @@ const PohonKinerjaPage = () => {
         };
 
         fetchTreeDetail();
-    }, [selectedId]); // Jalankan setiap kali selectedId berubah
+    }, [selectedId]); 
 
     return (
         <div className="w-full min-h-screen bg-gray-50 p-6">
@@ -80,8 +108,8 @@ const PohonKinerjaPage = () => {
                 <label className="text-sm font-semibold text-gray-600">Pilih Pohon Tematik:</label>
                 <select 
                     className="p-2 border border-gray-300 rounded-md shadow-sm bg-white min-w-75 focus:ring-2 focus:ring-blue-500 outline-none"
-                    onChange={(e) => setSelectedId(Number(e.target.value))}
-                    defaultValue=""
+                    onChange={handleSelectChange} // Ganti handler ke fungsi baru
+                    value={selectedId || ""}      // Bind value ke state agar sinkron
                 >
                     <option value="" disabled>-- Pilih Tematik --</option>
                     {listTematik.map((item) => (
