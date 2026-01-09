@@ -89,7 +89,7 @@ export const ModalAddCrosscutting: React.FC<modal> = ({isOpen, onClose, id, nama
             try{
                 const response = await fetch(`${API_URL}/pohon_kinerja_opd/detail/${id}`, {
                     headers: {
-                      Authorization: `${token}`,
+                    //   Authorization: `${token}`,
                       'Content-Type': 'application/json',
                     },
                 });
@@ -127,7 +127,7 @@ export const ModalAddCrosscutting: React.FC<modal> = ({isOpen, onClose, id, nama
         if(isOpen){
             fetchPohonIdUntukCross();
         }
-    },[id, reset, token, replace, isOpen]);
+    },[id, reset, replace, isOpen]);
     
     const fetchOpd = async() => {
       const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -136,7 +136,7 @@ export const ModalAddCrosscutting: React.FC<modal> = ({isOpen, onClose, id, nama
         const response = await fetch(`${API_URL}/opd/findall`,{
           method: 'GET',
           headers: {
-            Authorization: `${token}`,
+            // Authorization: `${token}`,
             'Content-Type': 'application/json',
           },
         });
@@ -179,7 +179,7 @@ export const ModalAddCrosscutting: React.FC<modal> = ({isOpen, onClose, id, nama
                 const response = await fetch(`${API_URL}/crosscutting_opd/create/${id}`, {
                     method: "POST",
                     headers: {
-                        Authorization: `${token}`,
+                        // Authorization: `${token}`,
                         "Content-Type" : "application/json",
                     },
                     body: JSON.stringify(formData),

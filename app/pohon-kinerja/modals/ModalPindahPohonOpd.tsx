@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Controller, SubmitHandler, useForm, useFieldArray } from "react-hook-form";
 import { ButtonSky, ButtonRed } from '@/components/global/Button';
 import { AlertNotification } from "@/components/global/Alert";
-import { getOpdTahun, getToken, getUser } from "@/components/lib/Cookie";
+// import { getOpdTahun, getToken, getUser } from "@/components/lib/cookie";
 import Select from 'react-select';
 import { TbCheck, TbCircleLetterXFilled, TbHourglass, TbCircleCheckFilled } from 'react-icons/tb';
 import { LoadingSync } from "@/components/global/Loading";
@@ -76,29 +76,29 @@ export const ModalPindahPohonOpd: React.FC<modal> = ({isOpen, onClose, onSuccess
     const [User, setUser] = useState<any>(null);
     const [Tahun, setTahun] = useState<any>(null);
     const [SelectedOpd, setSelectedOpd] = useState<any>(null);
-    const token = getToken();
+    // const token = getToken();
     
-    useEffect(() => {
-        const fetchUser = getUser();
-        const data = getOpdTahun();
-        if(fetchUser){
-            setUser(fetchUser.user);
-        }
-        if(data.tahun){
-            const tahun = {
-                value: data.tahun.value,
-                label: data.tahun.label,
-            }
-            setTahun(tahun);
-        }
-        if(data.opd){
-            const opd = {
-                value: data.opd.value,
-                label: data.opd.label,
-            }
-            setSelectedOpd(opd);
-        }
-    },[]);
+    // useEffect(() => {
+    //     const fetchUser = getUser();
+    //     const data = getOpdTahun();
+    //     if(fetchUser){
+    //         setUser(fetchUser.user);
+    //     }
+    //     if(data.tahun){
+    //         const tahun = {
+    //             value: data.tahun.value,
+    //             label: data.tahun.label,
+    //         }
+    //         setTahun(tahun);
+    //     }
+    //     if(data.opd){
+    //         const opd = {
+    //             value: data.opd.value,
+    //             label: data.opd.label,
+    //         }
+    //         setSelectedOpd(opd);
+    //     }
+    // },[]);
 
     useEffect(() => {
         const fetchPohonPilihan = async() => {
@@ -107,9 +107,9 @@ export const ModalPindahPohonOpd: React.FC<modal> = ({isOpen, onClose, onSuccess
             try{
                 const response = await fetch(`${API_URL}/pohon_kinerja_opd/detail/${id}`, {
                     method: "GET",
-                    headers : {
-                        Authorization : `${token}`,
-                    }
+                    // headers : {
+                    //     Authorization : `${token}`,
+                    // }
                 });
                 if(!response.ok){
                     throw new Error('terdapat kesalahan server backend saat fetch pohon yang akan dipindah');
@@ -126,7 +126,7 @@ export const ModalPindahPohonOpd: React.FC<modal> = ({isOpen, onClose, onSuccess
         if(isOpen){
             fetchPohonPilihan();
         }
-    }, [isOpen, id, token]);
+    }, [isOpen, id]);
 
 
     const fetchPohonParent = async (level: number) => {
@@ -147,8 +147,8 @@ export const ModalPindahPohonOpd: React.FC<modal> = ({isOpen, onClose, onSuccess
             const response = await fetch(`${API_URL}/${url}`, {
                 method: 'GET',
                 headers: {
-                    Authorization: `${token}`,
-                    'Content-Type': 'application/json',
+                    // Authorization: `${token}`,
+                    'Content-Type': 'application/json'
                 },
             });
             if (!response.ok) {
@@ -195,10 +195,10 @@ export const ModalPindahPohonOpd: React.FC<modal> = ({isOpen, onClose, onSuccess
             try{
                 const response = await fetch(`${API_URL}/pohon_kinerja_opd/pindah_parent/${id}`, {
                     method: "PUT",
-                    headers: {
-                        Authorization: `${token}`,
-                        "Content-Type" : "application/json",
-                    },
+                    // headers: {
+                    //     Authorization: `${token}`,
+                    //     "Content-Type" : "application/json",
+                    // },
                     body: JSON.stringify(formData),
                 });
                 if(response.ok){
@@ -290,7 +290,7 @@ export const ModalPindahPohonOpd: React.FC<modal> = ({isOpen, onClose, onSuccess
                     <div className="flex justify-between items-start py-2 gap-2 h-full overflow-auto">
                         {Loading ? 
                             <div className="flex w-full justify-center">
-                                <LoadingSync />
+                                <LoadingSync loading={false} />
                             </div>
                         :
                             <>
@@ -310,9 +310,9 @@ export const ModalPindahPohonOpd: React.FC<modal> = ({isOpen, onClose, onSuccess
                                     >
                                         <div
                                             className={`flex py-3 justify-center font-bold text-sm uppercase border my-3 rounded-lg bg-white
-                                                ${pohon?.jenis_pohon === "Strategic Pemda" && 'border-red-500 text-white bg-gradient-to-r from-[#CA3636] from-40% to-[#BD04A1]'}
-                                                ${pohon?.jenis_pohon === "Tactical Pemda" && 'border-blue-500 text-white bg-gradient-to-r from-[#3673CA] from-40% to-[#08D2FB]'}
-                                                ${pohon?.jenis_pohon === "Operational Pemda" && 'border-green-500 text-white bg-gradient-to-r from-[#007982] from-40% to-[#2DCB06]'}
+                                                ${pohon?.jenis_pohon === "Strategic Pemda" && 'border-red-500 text-white bg-linear-to-r from-[#CA3636] from-40% to-[#BD04A1]'}
+                                                ${pohon?.jenis_pohon === "Tactical Pemda" && 'border-blue-500 text-white bg-linear-to-r from-[#3673CA] from-40% to-[#08D2FB]'}
+                                                ${pohon?.jenis_pohon === "Operational Pemda" && 'border-green-500 text-white bg-linear-to-r from-[#007982] from-40% to-[#2DCB06]'}
                                                 ${(pohon?.jenis_pohon === "Strategic" || pohon?.jenis_pohon === 'Strategic Crosscutting') && 'border-red-500 text-red-500'}
                                                 ${(pohon?.jenis_pohon === "Tactical" || pohon?.jenis_pohon === 'Tactical Crosscutting') && 'border-blue-500 text-blue-500'}
                                                 ${(pohon?.jenis_pohon === "Operational" || pohon?.jenis_pohon === "Operational N") && 'border-green-500 text-green-500'}
@@ -345,9 +345,9 @@ export const ModalPindahPohonOpd: React.FC<modal> = ({isOpen, onClose, onSuccess
                                         >
                                             <div
                                                 className={`flex py-3 justify-center font-bold text-sm uppercase border my-3 rounded-lg bg-white
-                                                    ${PohonParent?.jenis_pohon === "Strategic Pemda" && 'border-red-500 text-white bg-gradient-to-r from-[#CA3636] from-40% to-[#BD04A1]'}
-                                                    ${PohonParent?.jenis_pohon === "Tactical Pemda" && 'border-blue-500 text-white bg-gradient-to-r from-[#3673CA] from-40% to-[#08D2FB]'}
-                                                    ${PohonParent?.jenis_pohon === "Operational Pemda" && 'border-green-500 text-white bg-gradient-to-r from-[#007982] from-40% to-[#2DCB06]'}
+                                                    ${PohonParent?.jenis_pohon === "Strategic Pemda" && 'border-red-500 text-white bg-linear-to-r from-[#CA3636] from-40% to-[#BD04A1]'}
+                                                    ${PohonParent?.jenis_pohon === "Tactical Pemda" && 'border-blue-500 text-white bg-linear-to-r from-[#3673CA] from-40% to-[#08D2FB]'}
+                                                    ${PohonParent?.jenis_pohon === "Operational Pemda" && 'border-green-500 text-white bg-linear-to-r from-[#007982] from-40% to-[#2DCB06]'}
                                                     ${(PohonParent?.jenis_pohon === "Strategic" || PohonParent?.jenis_pohon === 'Strategic Crosscutting') && 'border-red-500 text-red-500'}
                                                     ${(PohonParent?.jenis_pohon === "Tactical" || PohonParent?.jenis_pohon === 'Tactical Crosscutting') && 'border-blue-500 text-blue-500'}
                                                     ${(PohonParent?.jenis_pohon === "Operational" || PohonParent?.jenis_pohon === "Operational N") && 'border-green-500 text-green-500'}
@@ -413,7 +413,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                 <tbody>
                     <tr>
                         <td
-                            className={`min-w-[50px] border px-2 py-3 bg-white text-start rounded-tl-lg
+                            className={`min-w-25 border px-2 py-3 bg-white text-start rounded-tl-lg
                                 ${jenis === "Strategic" && "border-red-700"}
                                 ${jenis === "Tactical" && "border-blue-500"}
                                 ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -424,7 +424,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                             Nama Pohon
                         </td>
                         <td
-                            className={`min-w-[100px] border px-2 py-3 bg-white text-start rounded-tr-lg
+                            className={`min-w-25 border px-2 py-3 bg-white text-start rounded-tr-lg
                                 ${jenis === "Strategic" && "border-red-700"}
                                 ${jenis === "Tactical" && "border-blue-500"}
                                 ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -441,7 +441,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                                 <React.Fragment key={data.id_indikator}>
                                     <tr>
                                         <td
-                                            className={`min-w-[50px] border px-2 py-3 bg-white text-start
+                                            className={`min-w-25 border px-2 py-3 bg-white text-start
                                                 ${jenis === "Strategic" && "border-red-700"}
                                                 ${jenis === "Tactical" && "border-blue-500"}
                                                 ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -452,7 +452,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                                             Indikator {index + 1}
                                         </td>
                                         <td
-                                            className={`min-w-[100px] border px-2 py-3 bg-white text-start
+                                            className={`min-w-25 border px-2 py-3 bg-white text-start
                                                 ${jenis === "Strategic" && "border-red-700"}
                                                 ${jenis === "Tactical" && "border-blue-500"}
                                                 ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -467,7 +467,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                                         data.targets.map((data: any) => (
                                             <tr key={data.id_target}>
                                                 <td
-                                                    className={`min-w-[50px] border px-2 py-3 bg-white text-start
+                                                    className={`min-w-25 border px-2 py-3 bg-white text-start
                                                         ${jenis === "Strategic" && "border-red-700"}
                                                         ${jenis === "Tactical" && "border-blue-500"}
                                                         ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -478,7 +478,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                                                     Target/Satuan {index + 1}
                                                 </td>
                                                 <td
-                                                    className={`min-w-[100px] border px-2 py-3 bg-white text-start
+                                                    className={`min-w-25 border px-2 py-3 bg-white text-start
                                                         ${jenis === "Strategic" && "border-red-700"}
                                                         ${jenis === "Tactical" && "border-blue-500"}
                                                         ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -493,7 +493,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                                     :
                                             <tr>
                                                 <td
-                                                    className={`min-w-[50px] border px-2 py-3 bg-white text-start
+                                                    className={`min-w-25 border px-2 py-3 bg-white text-start
                                                         ${jenis === "Strategic" && "border-red-700"}
                                                         ${jenis === "Tactical" && "border-blue-500"}
                                                         ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -504,7 +504,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                                                     Target/Satuan
                                                 </td>
                                                 <td
-                                                    className={`min-w-[100px] border px-2 py-3 bg-white text-start
+                                                    className={`min-w-25 border px-2 py-3 bg-white text-start
                                                         ${jenis === "Strategic" && "border-red-700"}
                                                         ${jenis === "Tactical" && "border-blue-500"}
                                                         ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -523,7 +523,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                                 <React.Fragment key={data.id_indikator}>
                                     <tr>
                                         <td
-                                            className={`min-w-[50px] border px-2 py-3 bg-white text-start
+                                            className={`min-w-25 border px-2 py-3 bg-white text-start
                                                 ${jenis === "Strategic" && "border-red-700"}
                                                 ${jenis === "Tactical" && "border-blue-500"}
                                                 ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -534,7 +534,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                                             Indikator
                                         </td>
                                         <td
-                                            className={`min-w-[100px] border px-2 py-3 bg-white text-start
+                                            className={`min-w-25 border px-2 py-3 bg-white text-start
                                                 ${jenis === "Strategic" && "border-red-700"}
                                                 ${jenis === "Tactical" && "border-blue-500"}
                                                 ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -549,7 +549,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                                         data.targets.map((data: any) => (
                                             <tr key={data.id_target}>
                                                 <td
-                                                    className={`min-w-[50px] border px-2 py-3 bg-white text-start
+                                                    className={`min-w-25 border px-2 py-3 bg-white text-start
                                                         ${jenis === "Strategic" && "border-red-700"}
                                                         ${jenis === "Tactical" && "border-blue-500"}
                                                         ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -560,7 +560,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                                                     Target/Satuan
                                                 </td>
                                                 <td
-                                                    className={`min-w-[100px] border px-2 py-3 bg-white text-start
+                                                    className={`min-w-25 border px-2 py-3 bg-white text-start
                                                         ${jenis === "Strategic" && "border-red-700"}
                                                         ${jenis === "Tactical" && "border-blue-500"}
                                                         ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -575,7 +575,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                                     :
                                             <tr>
                                                 <td
-                                                    className={`min-w-[50px] border px-2 py-3 bg-white text-start
+                                                    className={`min-w-25 border px-2 py-3 bg-white text-start
                                                         ${jenis === "Strategic" && "border-red-700"}
                                                         ${jenis === "Tactical" && "border-blue-500"}
                                                         ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -586,7 +586,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                                                     Target/Satuan
                                                 </td>
                                                 <td
-                                                    className={`min-w-[100px] border px-2 py-3 bg-white text-start
+                                                    className={`min-w-25 border px-2 py-3 bg-white text-start
                                                         ${jenis === "Strategic" && "border-red-700"}
                                                         ${jenis === "Tactical" && "border-blue-500"}
                                                         ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -604,7 +604,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                         <>
                             <tr>
                                 <td
-                                    className={`min-w-[50px] border px-2 py-3 bg-white text-start
+                                    className={`min-w-25 border px-2 py-3 bg-white text-start
                                         ${jenis === "Strategic" && "border-red-700"}
                                         ${jenis === "Tactical" && "border-blue-500"}
                                         ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -615,7 +615,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                                     Indikator
                                 </td>
                                 <td
-                                    className={`min-w-[100px] border px-2 py-3 bg-white text-start
+                                    className={`min-w-25 border px-2 py-3 bg-white text-start
                                         ${jenis === "Strategic" && "border-red-700"}
                                         ${jenis === "Tactical" && "border-blue-500"}
                                         ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -628,7 +628,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                             </tr>
                             <tr>
                                 <td
-                                    className={`min-w-[50px] border px-2 py-3 bg-white text-start
+                                    className={`min-w-25 border px-2 py-3 bg-white text-start
                                         ${jenis === "Strategic" && "border-red-700"}
                                         ${jenis === "Tactical" && "border-blue-500"}
                                         ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -639,7 +639,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                                     Target/Satuan
                                 </td>
                                 <td
-                                    className={`min-w-[100px] border px-2 py-3 bg-white text-start
+                                    className={`min-w-25 border px-2 py-3 bg-white text-start
                                         ${jenis === "Strategic" && "border-red-700"}
                                         ${jenis === "Tactical" && "border-blue-500"}
                                         ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -655,7 +655,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                     {opd &&
                         <tr>
                             <td
-                                className={`min-w-[50px] border px-2 py-1 bg-white text-start
+                                className={`min-w-25 border px-2 py-1 bg-white text-start
                                     ${jenis === "Strategic" && "border-red-700"}
                                     ${jenis === "Tactical" && "border-blue-500"}
                                     ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -666,7 +666,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                                 Kode OPD
                             </td>
                             <td
-                                className={`min-w-[100px] border px-2 py-3 bg-white text-start
+                                className={`min-w-25 border px-2 py-3 bg-white text-start
                                     ${jenis === "Strategic" && "border-red-700"}
                                     ${jenis === "Tactical" && "border-blue-500"}
                                     ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -681,7 +681,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                     {nama_opd &&
                         <tr>
                             <td
-                                className={`min-w-[50px] border px-2 py-1 bg-white text-start
+                                className={`min-w-25 border px-2 py-1 bg-white text-start
                                     ${jenis === "Strategic" && "border-red-700"}
                                     ${jenis === "Tactical" && "border-blue-500"}
                                     ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -692,7 +692,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                                 Perangkat Daerah
                             </td>
                             <td
-                                className={`min-w-[100px] border px-2 py-3 bg-white text-start
+                                className={`min-w-25 border px-2 py-3 bg-white text-start
                                     ${jenis === "Strategic" && "border-red-700"}
                                     ${jenis === "Tactical" && "border-blue-500"}
                                     ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -707,7 +707,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                     {keterangan &&
                         <tr>
                             <td
-                                className={`min-w-[50px] border px-2 py-1 bg-white text-start rounded-bl-lg
+                                className={`min-w-25 border px-2 py-1 bg-white text-start rounded-bl-lg
                                     ${jenis === "Strategic" && "border-red-700"}
                                     ${jenis === "Tactical" && "border-blue-500"}
                                     ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -718,7 +718,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                                 Keterangan
                             </td>
                             <td
-                                className={`min-w-[100px] border px-2 py-3 bg-white text-start rounded-br-lg
+                                className={`min-w-25 border px-2 py-3 bg-white text-start rounded-br-lg
                                     ${jenis === "Strategic" && "border-red-700"}
                                     ${jenis === "Tactical" && "border-blue-500"}
                                     ${(jenis === "Operational" || jenis === "Operational N") && "border-green-500"}
@@ -733,7 +733,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                     {status &&
                         <tr>
                             <td
-                                className={`min-w-[50px] border px-2 py-1 bg-white text-start rounded-l-lg
+                                className={`min-w-25 border px-2 py-1 bg-white text-start rounded-l-lg
                                     ${(jenis === "Strategic Pemda" || jenis === "Tactical Pemda" || jenis === "Operational Pemda") && "border-black"}
                                     ${(jenis === "Strategic Crosscutting" || jenis === "Tactical Crosscutting" || jenis === "Operational Crosscutting" || jenis === "Operational N Crosscutting") && "border-yellow-700"}
                                     ${jenis === "Strategic" && "border-red-700"}
@@ -744,7 +744,7 @@ export const TablePohon = ({item} : {item: pohon}) => {
                                 Status
                             </td>
                             <td
-                                className={`min-w-[100px] border px-2 py-3 bg-white text-start rounded-r-lg
+                                className={`min-w-25 border px-2 py-3 bg-white text-start rounded-r-lg
                                     ${(jenis === "Strategic Pemda" || jenis === "Tactical Pemda" || jenis === "Operational Pemda") && "border-black"}
                                     ${(jenis === "Strategic Crosscutting" || jenis === "Tactical Crosscutting" || jenis === "Operational Crosscutting" || jenis === "Operational N Crosscutting") && "border-yellow-700"}
                                     ${jenis === "Strategic" && "border-red-700"}

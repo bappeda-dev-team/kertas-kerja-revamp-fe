@@ -130,7 +130,7 @@ export const ModalIndikator2: React.FC<modal2> = ({ isOpen, onClose, data, isi }
                         <table className="w-full">
                             <thead>
                                 <tr className="bg-black text-white">
-                                    <th className="border-r border-b border-white px-6 py-3 min-w-[400px]">Indikator</th>
+                                    <th className="border-r border-b border-white px-6 py-3 min-w-100">Indikator</th>
                                     <th className="border-r border-b border-white px-6 py-3 min-w-100">Rumus Perhitungan</th>
                                     <th className="border-r border-b border-white px-6 py-3 min-w-100">Sumber Data</th>
                                     <th className="border-r border-b border-white px-6 py-3 min-w-100">Target</th>

@@ -5,7 +5,7 @@ import { TbDeviceFloppy, TbX } from "react-icons/tb";
 import { Controller, SubmitHandler, useForm, useFieldArray } from "react-hook-form";
 import { ButtonSky, ButtonRed } from '@/components/global/Button';
 import { AlertNotification, AlertQuestion2 } from "@/components/global/Alert";
-import { getToken } from "@/components/lib/Cookie";
+// import { getToken } from "@/components/lib/Cookie";
 import { LoadingButtonClip } from "@/components/global/Loading";
 import Select from 'react-select';
 
@@ -41,7 +41,7 @@ export const ModalClone: React.FC<modal> = ({ isOpen, onClose, onSuccess, id, ta
     const [TahunTarget, setTahunTarget] = useState<OptionTypeString | null>(null);
 
     const [Proses, setProses] = useState<boolean>(false);
-    const token = getToken();
+    // const token = getToken();
 
     const handleClose = () => {
         setTahunTarget(null);
@@ -88,7 +88,7 @@ export const ModalClone: React.FC<modal> = ({ isOpen, onClose, onSuccess, id, ta
                 `, {
                 method: "POST",
                 headers: {
-                    Authorization: `${token}`,
+                    // Authorization: `${token}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(jenis === "pemda" ? formDataPemda : formDataOpd),
@@ -121,7 +121,7 @@ export const ModalClone: React.FC<modal> = ({ isOpen, onClose, onSuccess, id, ta
                 const response = await fetch(`${API_URL}/pohon_kinerja_opd/check_pokin/${kode_opd}/${TahunTarget?.value}`, {
                     method: "GET",
                     headers: {
-                        Authorization: `${token}`,
+                        // Authorization: `${token}`,
                         "Content-Type": "application/json",
                     },
                 });
@@ -231,7 +231,7 @@ export const ModalClone: React.FC<modal> = ({ isOpen, onClose, onSuccess, id, ta
                         <ButtonSky type="submit" className="w-full my-3" disabled={Proses}>
                             {Proses ?
                                 <>
-                                    <LoadingButtonClip />
+                                    <LoadingButtonClip loading={false} />
                                     <span>Cloning</span>
                                 </>
                                 :
