@@ -1,6 +1,20 @@
 @import "tailwindcss";
 
+/* 1. Definisikan variabel mentah di :root */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --dongker-gelap: #0f172a; 
+  --dongker-terang: #1e293b;
+  --teks-putih: #f8fafc;
+}
+
+/* 2. Daftarkan ke tema Tailwind v4 */
+@theme inline {
+  --color-sidebar-bg: var(--dongker-gelap);
+  --color-sidebar-text: var(--teks-putih);
+  --color-sidebar-active-bg: var(--dongker-terang);
+}
+
+/* 3. Pastikan body tidak menimpa warna secara tidak sengaja */
+body {
+  background-color: #f1f5f9;
 }
