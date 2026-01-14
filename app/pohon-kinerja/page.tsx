@@ -1,17 +1,16 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import apiClient from '../lib/axios';
 import './treeflex.css';
 import PohonNode from '@/components/PohonNode';
 import { PohonKinerja, TematikItem } from '@/app/pohon-kinerja/types';
 
-// Import komponen layout
 import Sidebar from "@/components/layout/Sidebar"; 
 import PageHeader from "@/components/layout/PageHeader"; 
 
-const PohonKinerjaPage = () => {
+const PohonKinerjaContent = () => {
     // Hooks untuk URL Params
     const router = useRouter();
     const pathname = usePathname();
@@ -172,6 +171,21 @@ const PohonKinerjaPage = () => {
                 </main>
             </div>
         </div>
+    );
+}
+
+const PohonKinerjaPage = () => {
+    return (
+        <Suspense fallback={
+            <div className="flex h-screen w-full items-center justify-center bg-gray-100">
+                <div className="flex flex-col items-center gap-2">
+                    <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-gray-600">Memuat Halaman...</p>
+                </div>
+            </div>
+        }>
+            <PohonKinerjaContent />
+        </Suspense>
     );
 }
 
