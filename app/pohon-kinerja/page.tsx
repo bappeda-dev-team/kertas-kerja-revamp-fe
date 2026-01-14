@@ -139,7 +139,7 @@ const PohonKinerjaPage = () => {
                     </div>
 
                     {/* Area Visualisasi Tree */}
-                    <div className="w-full bg-white rounded-xl shadow-md border border-gray-200 p-4 min-h-[500px] overflow-x-auto">
+                    <div className="w-full bg-white rounded-xl shadow-md border border-gray-200 p-4 min-h-125 overflow-x-auto">
                         {loading && (
                             <div className="flex items-center justify-center h-64 text-gray-500 animate-pulse">
                                 <div className="flex flex-col items-center gap-2">
