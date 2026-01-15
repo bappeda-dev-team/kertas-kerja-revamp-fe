@@ -2,33 +2,33 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import apiClient from '../lib/axios';
+import { crud } from '../lib/axios';
 import './treeflex.css';
 import PohonNode from '@/components/PohonNode';
 import { PohonKinerja, TematikItem } from '@/app/pohon-kinerja/types';
 
 import Sidebar from "@/components/layout/Sidebar"; 
 import PageHeader from "@/components/layout/PageHeader"; 
+import { AlertNotification } from '@/components/global/Alert';
 
 const PohonKinerjaContent = () => {
-    // Hooks untuk URL Params
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-    // State untuk Layout
     const [sidebarOpen, setSidebarOpen] = useState(true);
-
-    // State untuk Dropdown
     const [listTematik, setListTematik] = useState<TematikItem[]>([]);
     const [selectedId, setSelectedId] = useState<number | null>(null);
-
-    // State untuk Tree Data
     const [treeData, setTreeData] = useState<PohonKinerja | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [deleted, setDeleted] = useState(false);
 
-    // 1. LOGIC SINKRONISASI URL & STATE
+    // --- STATE UNTUK MODAL DELETE ---
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleteId, setDeleteId] = useState<number | string | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
     useEffect(() => {
         const pohonIdParam = searchParams.get('pohon_id');
         if (pohonIdParam) {
@@ -52,13 +52,50 @@ const PohonKinerjaContent = () => {
         router.replace(`${pathname}?${params.toString()}`);
     };
 
-    // 2. FETCH DATA
+    // 1. Fungsi yang dipanggil saat tombol Delete ditekan (Hanya buka modal)
+    const confirmDelete = (id: number | string) => {
+        setDeleteId(id);
+        setShowDeleteModal(true);
+    };
+
+    // 2. Fungsi Eksekusi Hapus (Dipanggil saat klik "Ya" di modal)
+    const handleDeleteExecute = async () => {
+        if (!deleteId) return;
+
+        setIsDeleting(true);
+        try {
+            const response = await crud.delete(`/pohon_kinerja/${deleteId}`);
+
+            if (response.success) {
+                AlertNotification("Berhasil", "Data Pohon Berhasil Dihapus", "success", 1000);
+                setDeleted(prev => !prev);
+                
+                // Jika yang dihapus adalah pohon yang sedang dibuka
+                if (Number(deleteId) === selectedId) {
+                    const params = new URLSearchParams(searchParams);
+                    params.delete('pohon_id');
+                    router.replace(`${pathname}?${params.toString()}`);
+                    setTreeData(null);
+                    setSelectedId(null);
+                }
+            }
+        } catch (error: any) {
+            const message = error?.message || "Cek koneksi internet atau database server";
+            AlertNotification("Gagal", message, "error", 2000);
+            console.error(error);
+        } finally {
+            setIsDeleting(false);
+            setShowDeleteModal(false); // Tutup modal apa pun hasilnya
+            setDeleteId(null);
+        }
+    };
+
     useEffect(() => {
         const fetchTematikList = async () => {
             try {
-                const response = await apiClient.get('/pohon-kinerja/tematik');
-                if (response.data.success) {
-                    setListTematik(response.data.data);
+                const response = await crud.get<TematikItem[]>('/pohon-kinerja/tematik');
+                if (response.success) {
+                    setListTematik(response.data);
                 }
             } catch (err) {
                 console.error("Gagal load list tematik", err);
@@ -66,7 +103,7 @@ const PohonKinerjaContent = () => {
             }
         };
         fetchTematikList();
-    }, []);
+    }, [deleted]);
 
     useEffect(() => {
         if (!selectedId) return; 
@@ -76,11 +113,11 @@ const PohonKinerjaContent = () => {
             setError(null);
             
             try {
-                const response = await apiClient.get(`/pohon-kinerja/${selectedId}`);
-                if (response.data.success) {
-                    setTreeData(response.data.data);
+                const response = await crud.get<PohonKinerja>(`/pohon-kinerja/${selectedId}`);
+                if (response.success) {
+                    setTreeData(response.data);
                 } else {
-                    setError(response.data.message);
+                    setError(response.message);
                 }
             } catch (err) {
                 console.error("Gagal load tree detail", err);
@@ -94,24 +131,15 @@ const PohonKinerjaContent = () => {
     }, [selectedId]); 
 
     return (
-        // Container Utama (Sama dengan Home/Dashboard)
-        <div className="flex h-screen w-full bg-gray-100 overflow-hidden font-sans text-gray-800">
-            
-            {/* 1. SIDEBAR */}
+        <div className="flex h-screen w-full bg-gray-100 overflow-hidden font-sans text-gray-800 relative">
             <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
-            {/* 2. AREA KANAN */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-                
-                {/* Header Container */}
                 <header className="p-4">
                     <PageHeader />
                 </header>
 
-                {/* Main Content Area */}
                 <main className="flex-1 overflow-y-auto p-4 md:p-6">
-                    
-                    {/* Kotak Kontrol/Dropdown */}
                     <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
                         <div className="flex flex-col items-center justify-center gap-3">
                             <h1 className="text-xl font-bold text-gray-800">
@@ -137,7 +165,6 @@ const PohonKinerjaContent = () => {
                         </div>
                     </div>
 
-                    {/* Area Visualisasi Tree */}
                     <div className="w-full bg-white rounded-xl shadow-md border border-gray-200 p-4 min-h-125 overflow-x-auto">
                         {loading && (
                             <div className="flex items-center justify-center h-64 text-gray-500 animate-pulse">
@@ -163,13 +190,56 @@ const PohonKinerjaContent = () => {
                         {!loading && !error && treeData && (
                             <div className="tf-tree tf-gap-lg flex justify-center items-start min-w-max mx-auto py-10">
                                 <ul>
-                                    <PohonNode node={treeData} />
+                                    {/* Pastikan PohonNode menerima props onDelete */}
+                                    <PohonNode node={treeData} onDeleteAction={confirmDelete} />
                                 </ul>
                             </div>
                         )}
                     </div>
                 </main>
             </div>
+
+            {/* --- MODAL CONFIRMATION DIALOG --- */}
+            {showDeleteModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 transform transition-all scale-100">
+                        <div className="flex items-center gap-3 mb-4 text-red-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <h3 className="text-lg font-bold">Konfirmasi Hapus</h3>
+                        </div>
+                        
+                        <p className="text-gray-600 mb-6">
+                            Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.
+                        </p>
+                        
+                        <div className="flex justify-end gap-3">
+                            <button 
+                                onClick={() => setShowDeleteModal(false)}
+                                disabled={isDeleting}
+                                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-medium transition disabled:opacity-50"
+                            >
+                                Batal
+                            </button>
+                            <button 
+                                onClick={handleDeleteExecute}
+                                disabled={isDeleting}
+                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition flex items-center gap-2 disabled:opacity-50"
+                            >
+                                {isDeleting ? (
+                                    <>
+                                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                                        Menghapus...
+                                    </>
+                                ) : (
+                                    "Ya, Hapus"
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
