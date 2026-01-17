@@ -55,7 +55,7 @@ apiClient.interceptors.response.use(
   }
 );
 
-export const crud = {
+export const api = {
   get: async <T>(url: string, config?: AxiosRequestConfig): Promise<BaseResponse<T>> => {
     const res = await apiClient.get<BaseResponse<T>>(url, config);
     return res.data;

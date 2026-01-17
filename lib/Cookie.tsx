@@ -1,4 +1,4 @@
-import { AlertNotification } from "../global/Alert";
+import { AlertNotification } from "../components/global/Alert";
 
 // ==========================
 // Utilities: Cookie helpers

@@ -7,13 +7,11 @@ import { usePathname } from 'next/navigation';
 
 import { 
     Home, 
-    LogOut,
     PanelLeftClose, 
     PanelRightClose, 
     Network, // Icon baru untuk Pohon Kinerja
     ChevronDown, 
 } from 'lucide-react';
-import { logout } from '../lib/Cookie';
 
 // Tipe untuk setiap item navigasi
 type NavItem = {
@@ -27,7 +25,8 @@ type NavItem = {
 // MODIFIKASI: Struktur data hanya Dashboard dan Pohon Kinerja (+ Logout)
 const navItems: NavItem[] = [
     { href: '/', icon: Home, label: 'Dashboard' },
-    { href: '/pohon-kinerja', icon: Network, label: 'Pohon Kinerja' }, // Menu baru
+    { href: '/pohon-kinerja', icon: Network, label: 'Pohon Kinerja Pemda' }, // Menu baru
+    { href: '/pohon-kinerja-opd', icon: Network, label: 'Pohon Kinerja OPD' },
     // { href: '/logout', icon: LogOut, label: 'Logout', action: logout },
 ];
 
@@ -129,15 +128,15 @@ const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (isOpen: b
             <div className="flex-1 p-4">
                 {/* Header dan Logo */}
                 <div className="flex items-center justify-center mb-8 relative h-14">
-                    {/* {isOpen && (
+                    {isOpen && (
                         <Image
-                            src="/logo-mahakam-ulu.svg"
-                            alt="Logo Mahakam Ulu"
+                            src="/Kab-Ponorogo.svg"
+                            alt="Logo Kab Ponorogo"
                             width={55}
                             height={55}
                             className="transition-opacity duration-300"
                         />
-                    )} */}
+                    )}
                     <button
                         onClick={() => setIsOpen(!isOpen)}
                         className="p-2 text-gray-400 hover:text-white absolute right-0"

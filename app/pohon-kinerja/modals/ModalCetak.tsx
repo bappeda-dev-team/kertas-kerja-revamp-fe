@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { ButtonSkyBorder, ButtonRed } from '@/components/global/Button';
 import { TbPrinter, TbXboxX } from "react-icons/tb";
 import html2canvas from "html2canvas";
 import { LoadingButtonClip2 } from "@/components/global/Loading";
-
 
 interface modal {
     jenis: 'cascading' | 'non_cascading' | 'laporan';

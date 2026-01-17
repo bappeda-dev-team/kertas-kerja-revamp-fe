@@ -3,7 +3,7 @@
 
 import React, { useState } from "react";
 import { PohonKinerja } from "@/app/pohon-kinerja/types";
-import { crud } from "../../lib/axios"; 
+import { api } from "../../../lib/axios"; 
 import { AlertNotification } from "@/components/global/Alert"; 
 
 interface FormEditNodeProps {
@@ -21,8 +21,6 @@ export const FormEditNode: React.FC<FormEditNodeProps> = ({ node, onCancel, onSu
     keterangan: node.keterangan || "",
   });
 
-  // State Indikator (Flattening structure)
-  // Kita ambil indikator existing, atau array kosong jika tidak ada
   const [indikators, setIndikators] = useState<any[]>(
     node.indikator?.map((ind) => ({
       id: ind.id, 
@@ -104,7 +102,7 @@ export const FormEditNode: React.FC<FormEditNodeProps> = ({ node, onCancel, onSu
     console.log("Payload Final:", JSON.stringify(payload, null, 2));
 
     try {
-      const response = await crud.put(`/pohon-kinerja/${node.id}`, payload);
+      const response = await api.put(`/pohon-kinerja/${node.id}`, payload);
       
       if (response.success) {
         AlertNotification("Berhasil", "Data berhasil diperbarui", "success");

@@ -2,9 +2,9 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { crud } from '../lib/axios';
+import { api } from '../../lib/axios';
 import './treeflex.css';
-import PohonNode from '@/components/PohonNode';
+import Pohon from '@/components/Pohon';
 import { PohonKinerja, TematikItem } from '@/app/pohon-kinerja/types';
 
 import Sidebar from "@/components/layout/Sidebar"; 
@@ -64,7 +64,7 @@ const PohonKinerjaContent = () => {
 
         setIsDeleting(true);
         try {
-            const response = await crud.delete(`/pohon_kinerja/${deleteId}`);
+            const response = await api.delete(`/pohon-kinerja/${deleteId}`);
 
             if (response.success) {
                 AlertNotification("Berhasil", "Data Pohon Berhasil Dihapus", "success", 1000);
@@ -93,7 +93,7 @@ const PohonKinerjaContent = () => {
     useEffect(() => {
         const fetchTematikList = async () => {
             try {
-                const response = await crud.get<TematikItem[]>('/pohon-kinerja/tematik');
+                const response = await api.get<TematikItem[]>('/pohon-kinerja/tematik');
                 if (response.success) {
                     setListTematik(response.data);
                 }
@@ -113,7 +113,7 @@ const PohonKinerjaContent = () => {
             setError(null);
             
             try {
-                const response = await crud.get<PohonKinerja>(`/pohon-kinerja/${selectedId}`);
+                const response = await api.get<PohonKinerja>(`/pohon-kinerja/${selectedId}`);
                 if (response.success) {
                     setTreeData(response.data);
                 } else {
@@ -190,8 +190,8 @@ const PohonKinerjaContent = () => {
                         {!loading && !error && treeData && (
                             <div className="tf-tree tf-gap-lg flex justify-center items-start min-w-max mx-auto py-10">
                                 <ul>
-                                    {/* Pastikan PohonNode menerima props onDelete */}
-                                    <PohonNode node={treeData} onDeleteAction={confirmDelete} />
+                                    {/* Pastikan Pohon menerima props onDelete */}
+                                    <Pohon node={treeData} onDeleteAction={confirmDelete} />
                                 </ul>
                             </div>
                         )}

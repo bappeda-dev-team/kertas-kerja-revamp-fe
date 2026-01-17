@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { crud } from '../../lib/axios'; // Pastikan path axios benar
+import { api } from '../../../lib/axios'; // Pastikan path axios benar
 
 interface FormAddChildModalProps {
     parentId: number;
@@ -81,7 +81,7 @@ export const FormAddChildModal: React.FC<FormAddChildModalProps> = ({ parentId, 
         };
 
         try {
-            const response = await crud.post(`/pohon-kinerja`, payload);
+            const response = await api.post(`/pohon-kinerja`, payload);
             if (response.success || response.status === 200 || response.status === 201) {
                 onSuccess();
             } else {
