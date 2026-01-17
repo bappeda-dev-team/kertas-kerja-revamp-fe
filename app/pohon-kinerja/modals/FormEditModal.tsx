@@ -3,7 +3,7 @@
 
 import React, { useState } from "react";
 import { PohonKinerja } from "@/app/pohon-kinerja/types";
-import { crud } from "../lib/axios"; 
+import { crud } from "../../lib/axios"; 
 import { AlertNotification } from "@/components/global/Alert"; 
 
 interface FormEditNodeProps {
