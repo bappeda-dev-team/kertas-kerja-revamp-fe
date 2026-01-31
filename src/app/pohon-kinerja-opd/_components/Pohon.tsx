@@ -2,10 +2,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { PohonKinerja, Indikator } from "@/src/app/pohon-kinerja-opd/types";
-import { getChildInfo, getPohonStyle } from "@/src/app/pohon-kinerja-opd/utils";
-import { FormAddChildModal } from "@/src/app/pohon-kinerja-opd/_components/ModalAdd";
-import { FormEditNode } from "@/src/app/pohon-kinerja-opd/_components/ModalEdit";
+import { PohonKinerja, Indikator } from "@/src/app/pohon-kinerja-opd/_types";
+import { getChildInfo, getPohonStyle } from "@/src/app/pohon-kinerja-opd/_utils";
+import { FormAddChildModal } from "@/src/app/pohon-kinerja-opd/_components/_modals/ModalAdd";
+import { FormEditNode } from "@/src/app/pohon-kinerja-opd/_components/_modals/ModalEdit";
 import { getCookie } from "@/src/components/lib/Cookie";
 
 interface PohonNodeOpdProps {

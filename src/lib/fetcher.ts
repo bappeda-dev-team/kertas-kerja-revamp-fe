@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
 import { getCookie } from "cookies-next";
 import { getSession } from "next-auth/react";
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
 interface ReqApi {

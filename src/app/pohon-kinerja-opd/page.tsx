@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { fetchApi } from '@/src/lib/fetcher';
-import './treeflex.css';
-import PohonNodeOpd from '@/src/components/PohonNodeOpd';
-import { PohonKinerja } from '@/src/app/pohon-kinerja/types';
+import './_styles/treeflex.css';
+import PohonNodeOpd from '@/src/app/pohon-kinerja-opd/_components/Pohon';
+import { PohonKinerja } from '@/src/app/pohon-kinerja/_types';
 
 import Sidebar from "@/src/components/global/Sidebar"; 
 import PageHeader from "@/src/components/global/Header"; 

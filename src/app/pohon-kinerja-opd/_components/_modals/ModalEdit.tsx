@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { PohonKinerja } from "@/src/app/pohon-kinerja/types";
+import { PohonKinerja } from "@/src/app/pohon-kinerja/_types";
 import { fetchApi } from "@/src/lib/fetcher";
 import { AlertNotification } from "@/src/components/global/Alert";
 

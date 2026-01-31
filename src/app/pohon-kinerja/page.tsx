@@ -3,9 +3,9 @@
 import { useEffect, useState, Suspense } from 'react'; // Tambahkan Suspense
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { fetchApi } from '@/src/lib/fetcher';
-import './treeflex.css';
-import PohonNode from '@/src/components/PohonNode';
-import { PohonKinerja, TematikItem } from '@/src/app/pohon-kinerja/types';
+import './_styles/treeflex.css';
+import PohonNode from '@/src/app/pohon-kinerja/_components/Pohon';
+import { PohonKinerja, TematikItem } from '@/src/app/pohon-kinerja/_types';
 
 // Import komponen layout
 import Sidebar from "@/src/components/global/Sidebar"; 
