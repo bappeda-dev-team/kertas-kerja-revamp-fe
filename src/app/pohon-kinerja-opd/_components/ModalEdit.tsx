@@ -94,7 +94,6 @@ export const FormEditNode: React.FC<FormEditNodeProps> = ({ node, onCancel, onSu
       // Data Konteks (Penting agar tidak hilang)
       kodeOpd: kodeOpd || node.kodeOpd || "",
       kodePemda: node.kodePemda || "",
-      sifat: node.sifat || null,
 
       indikators: indikatorsPayload
     };
