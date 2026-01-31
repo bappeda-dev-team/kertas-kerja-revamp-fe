@@ -8,9 +8,9 @@ import PohonNode from '@/src/components/PohonNode';
 import { PohonKinerja, TematikItem } from '@/src/app/pohon-kinerja/types';
 
 // Import komponen layout
-import Sidebar from "@/src/components/global/sidebar/Sidebar"; 
-import PageHeader from "@/src/components/global/header/Header"; 
-import Breadcrumb from "@/src/components/global/breadcrumb/Breadcrumb";
+import Sidebar from "@/src/components/global/Sidebar"; 
+import PageHeader from "@/src/components/global/Header"; 
+import Breadcrumb from "@/src/components/global/Breadcrumb";
 
 const PohonKinerjaPage = () => {
     // Hooks untuk URL Params

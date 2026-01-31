@@ -5,9 +5,9 @@ import { FileText, Download } from 'lucide-react';
 import ContentContainer from '../../components/global/contentContainer';
 
 // 2. Import komponen layout
-import Sidebar from "@/src/components/global/sidebar/Sidebar";
-import PageHeader from "@/src/components/global/header/Header";
-import Breadcrumb from '@/src/components/global/breadcrumb/Breadcrumb';
+import Sidebar from "@/src/components/global/Sidebar";
+import PageHeader from "@/src/components/global/Header";
+import Breadcrumb from '@/src/components/global/Breadcrumb';
 
 const DashboardPage = () => {
   // State untuk Sidebar (Sama seperti di PohonKinerja)

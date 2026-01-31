@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Sidebar from "@/src/components/global/sidebar/Sidebar";
-import Header from "@/src/components/global/header/Header";
+import Sidebar from "@/src/components/global/Sidebar";
+import Header from "@/src/components/global/Header";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import ModalAddTematik from "./_components/ModalAddTematik";
 import ModalEditTematik from "./_components/ModalEditTematik";
-import Breadcrumb from "@/src/components/global/breadcrumb/Breadcrumb";
+import Breadcrumb from "@/src/components/global/Breadcrumb";
 import { fetchApi } from "@/src/lib/fetcher";
 import { getOpdTahun } from "@/src/components/lib/Cookie";
 

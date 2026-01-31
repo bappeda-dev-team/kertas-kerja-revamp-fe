@@ -3,7 +3,6 @@ import { getCookie } from "cookies-next";
 import { getSession } from "next-auth/react";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { authOptions } from "@/src/app/api/auth/[...nextauth]/route";
 
 interface ReqApi {
   type: "auth" | "withoutAuth";
@@ -44,8 +43,8 @@ export async function fetchApi({
       if (overrideToken) {
         authToken = overrideToken;
       } else if (typeof window === "undefined") {
-        const session: any = await getServerSession(authOptions);
-        authToken = session?.accessToken ?? null;
+        // const session: any = await getServerSession(authOptions);
+        // authToken = session?.accessToken ?? null;
       } else {
         const session: any = await getSession();
         authToken = session?.accessToken ?? null;

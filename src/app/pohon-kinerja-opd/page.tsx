@@ -6,9 +6,9 @@ import './treeflex.css';
 import PohonNodeOpd from '@/src/components/PohonNodeOpd';
 import { PohonKinerja } from '@/src/app/pohon-kinerja/types';
 
-import Sidebar from "@/src/components/global/sidebar/Sidebar"; 
-import PageHeader from "@/src/components/global/header/Header"; 
-import Breadcrumb from '@/src/components/global/breadcrumb/Breadcrumb';
+import Sidebar from "@/src/components/global/Sidebar"; 
+import PageHeader from "@/src/components/global/Header"; 
+import Breadcrumb from '@/src/components/global/Breadcrumb';
 import { getOpdTahun } from "@/src/components/lib/Cookie";
 
 const PohonKinerjaOpdPage = () => {
