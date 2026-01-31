@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react'; // Tambahkan Suspense
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { fetchApi } from '@/src/lib/fetcher';
 import './treeflex.css';
@@ -12,7 +12,8 @@ import Sidebar from "@/src/components/global/Sidebar";
 import PageHeader from "@/src/components/global/Header"; 
 import Breadcrumb from "@/src/components/global/Breadcrumb";
 
-const PohonKinerjaPage = () => {
+// 1. PISAHKAN LOGIKA UTAMA KE DALAM KOMPONEN 'CONTENT'
+const PohonKinerjaContent = () => {
     // Hooks untuk URL Params
     const router = useRouter();
     const pathname = usePathname();
@@ -30,7 +31,7 @@ const PohonKinerjaPage = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    // 1. LOGIC SINKRONISASI URL & STATE
+    // LOGIC SINKRONISASI URL & STATE
     useEffect(() => {
         const pohonIdParam = searchParams.get('pohon_id');
         if (pohonIdParam) {
@@ -43,7 +44,7 @@ const PohonKinerjaPage = () => {
 
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const newId = e.target.value;
-        const params = new URLSearchParams(searchParams.toString()); // Fix: toString() needed
+        const params = new URLSearchParams(searchParams.toString());
 
         if (newId) {
             params.set('pohon_id', newId);
@@ -54,7 +55,7 @@ const PohonKinerjaPage = () => {
         router.replace(`${pathname}?${params.toString()}`);
     };
 
-    // 2. FETCH DATA
+    // FETCH DATA TEMATIK
     useEffect(() => {
         const fetchTematikList = async () => {
             try {
@@ -62,11 +63,11 @@ const PohonKinerjaPage = () => {
                     type: "withoutAuth",
                     url: "/pohon-kinerja/tematik",
                     method: "GET"
-                    });
+                });
 
-                    if (res?.data?.success) {
+                if (res?.data?.success) {
                     setListTematik(res.data.data);
-                    }
+                }
             } catch (err) {
                 console.error("Gagal load list tematik", err);
                 setError("Gagal memuat daftar pohon.");
@@ -75,6 +76,7 @@ const PohonKinerjaPage = () => {
         fetchTematikList();
     }, []);
 
+    // FETCH TREE DETAIL
     useEffect(() => {
         if (!selectedId) return; 
 
@@ -84,15 +86,15 @@ const PohonKinerjaPage = () => {
             
             try {
                 const res = await fetchApi({
-                type: "withoutAuth",
-                url: `/pohon-kinerja/${selectedId}`,
-                method: "GET"
+                    type: "withoutAuth",
+                    url: `/pohon-kinerja/${selectedId}`,
+                    method: "GET"
                 });
 
                 if (res?.data?.success) {
-                setTreeData(res.data.data);
+                    setTreeData(res.data.data);
                 } else {
-                setError(res?.data?.message || "Gagal memuat data");
+                    setError(res?.data?.message || "Gagal memuat data");
                 }
  
             } catch (err) {
@@ -110,10 +112,10 @@ const PohonKinerjaPage = () => {
         // Container Utama
         <div className="flex h-screen w-full bg-gray-100 overflow-hidden font-sans text-gray-800">
             
-            {/* 1. SIDEBAR */}
+            {/* SIDEBAR */}
             <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
-            {/* 2. AREA KANAN */}
+            {/* AREA KANAN */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
                 
                 {/* Header Container */}
@@ -191,6 +193,22 @@ const PohonKinerjaPage = () => {
             </div>
         </div>
     );
-}
+};
+
+// 2. BUAT KOMPONEN PEMBUNGKUS (PAGE) DENGAN SUSPENSE
+const PohonKinerjaPage = () => {
+    return (
+        <Suspense fallback={
+            <div className="flex h-screen w-full items-center justify-center bg-gray-100">
+                <div className="flex flex-col items-center gap-2">
+                    <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-gray-600 font-medium">Memuat Halaman...</p>
+                </div>
+            </div>
+        }>
+            <PohonKinerjaContent />
+        </Suspense>
+    );
+};
 
 export default PohonKinerjaPage;
