@@ -16,7 +16,6 @@ import {
     Layers,     // Icon untuk Tematik
     Building2   // Icon untuk OPD
 } from 'lucide-react';
-import { logout } from '../../lib/cookie';
 
 // Tipe untuk setiap item navigasi
 type NavItem = {
