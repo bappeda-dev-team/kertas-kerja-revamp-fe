@@ -1,16 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 import { 
     Home, 
+    LogOut,
     PanelLeftClose, 
     PanelRightClose, 
-    Network, // Icon baru untuk Pohon Kinerja
-    ChevronDown, 
+    Network, 
+    ChevronDown,
+    FileText,   // Icon untuk Perencanaan
+    Layers,     // Icon untuk Tematik
+    Building2   // Icon untuk OPD
 } from 'lucide-react';
 
 // Tipe untuk setiap item navigasi
@@ -22,11 +26,30 @@ type NavItem = {
     action?: () => void; 
 };
 
-// MODIFIKASI: Struktur data hanya Dashboard dan Pohon Kinerja (+ Logout)
+// MODIFIKASI: Struktur Data Hierarki (Beranak)
 const navItems: NavItem[] = [
-    { href: '/', icon: Home, label: 'Dashboard' },
-    { href: '/pohon-kinerja', icon: Network, label: 'Pohon Kinerja Pemda' }, // Menu baru
-    { href: '/pohon-kinerja-opd', icon: Network, label: 'Pohon Kinerja OPD' },
+    { 
+        href: '/', 
+        icon: Home, 
+        label: 'Dashboard' 
+    },
+    {
+        href: 'pemda-group', // ID unik untuk state menu (bukan link halaman)
+        icon: FileText,
+        label: 'Perencanaan Pemda',
+        subItems: [
+            { href: '/tematik', icon: Layers, label: 'Tematik' },
+            { href: '/pohon-kinerja', icon: Network, label: 'Pohon Kinerja Pemda' },
+        ]
+    },
+    {
+        href: 'opd-group', // ID unik untuk state menu
+        icon: Building2,
+        label: 'Perencanaan OPD',
+        subItems: [
+            { href: '/pohon-kinerja-opd', icon: Network, label: 'Pohon Kinerja OPD' },
+        ]
+    },
     // { href: '/logout', icon: LogOut, label: 'Logout', action: logout },
 ];
 
@@ -34,7 +57,21 @@ const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (isOpen: b
     const pathname = usePathname();
     const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
 
+    // Effect: Otomatis buka menu parent jika url child aktif saat refresh
+    useEffect(() => {
+        navItems.forEach(item => {
+            if (item.subItems) {
+                const isChildActive = item.subItems.some(sub => pathname.startsWith(sub.href));
+                if (isChildActive) {
+                    setOpenMenus(prev => ({ ...prev, [item.href]: true }));
+                }
+            }
+        });
+    }, [pathname]);
+
     const handleMenuClick = (href: string) => {
+        // Jika sidebar tertutup, buka dulu
+        if (!isOpen) setIsOpen(true);
         setOpenMenus(prevState => ({ ...prevState, [href]: !prevState[href] }));
     };
 
@@ -45,40 +82,51 @@ const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (isOpen: b
 
     const renderNavItems = () => {
         return navItems.map((item) => {
-            const isParentActive = item.subItems 
-                ? pathname.startsWith(item.href) 
-                : pathname === item.href;
+            // Cek apakah item ini aktif (untuk single link) atau anaknya aktif (untuk dropdown)
+            const isSingleActive = pathname === item.href;
             
-            // Render logic untuk Dropdown (jika nanti dibutuhkan lagi)
+            // Logic baru: Parent dianggap aktif jika salah satu anaknya aktif
+            const isParentActive = item.subItems 
+                ? item.subItems.some(sub => pathname.startsWith(sub.href))
+                : isSingleActive;
+            
+            // Render logic untuk Dropdown (Menu Beranak)
             if (item.subItems) {
                 return (
-                    <li key={item.label}>
+                    <li key={item.label} className="mb-1">
                         <button
                             onClick={() => handleMenuClick(item.href)}
-                            className={`w-full flex items-center justify-between gap-3 p-3 my-1 rounded-md transition-colors ${
-                                isParentActive ? 'bg-sidebar-active-bg text-sidebar-active-text font-bold' : 'hover:bg-white/20'
+                            className={`w-full flex items-center justify-between gap-3 p-3 rounded-md transition-colors ${
+                                // Jika parent aktif (anaknya dibuka), beri warna background sedikit
+                                isParentActive ? 'bg-white/10 text-white font-medium' : 'hover:bg-white/10 text-sidebar-text/80'
                             } ${!isOpen && 'justify-center'}`}
                         >
                             <div className="flex items-center gap-3">
-                                <item.icon size={20} />
+                                <item.icon size={20} className={isParentActive ? 'text-sky-400' : ''} />
                                 <span className={!isOpen ? 'hidden' : 'block'}>{item.label}</span>
                             </div>
                             {isOpen && (
-                                <ChevronDown size={16} className={`transition-transform ${openMenus[item.href] ? 'rotate-180' : ''}`} />
+                                <ChevronDown size={16} className={`transition-transform duration-200 ${openMenus[item.href] ? 'rotate-180' : ''}`} />
                             )}
                         </button>
+                        
+                        {/* Sub Menu / Anak-anak */}
                         {isOpen && openMenus[item.href] && (
-                            <ul className="pl-6 mt-1">
+                            <ul className="pl-4 mt-1 space-y-1 bg-black/10 rounded-md py-1">
                                 {item.subItems.map((subItem) => {
-                                    const isSubItemActive = pathname.startsWith(subItem.href);
+                                    const isSubItemActive = pathname === subItem.href;
                                     return (
                                         <li key={subItem.label}>
                                             <Link
                                                 href={subItem.href}
-                                                className={`flex items-center gap-3 p-2 my-1 rounded-md transition-colors text-sm ${
-                                                    isSubItemActive ? 'bg-sidebar-active-bg text-sidebar-active-text font-semibold' : 'hover:bg-white/20'
+                                                className={`flex items-center gap-3 p-2 rounded-md transition-colors text-sm ${
+                                                    isSubItemActive 
+                                                        ? 'bg-sky-600 text-white shadow-md font-medium' // Style Active Child
+                                                        : 'text-sidebar-text/70 hover:bg-white/10 hover:text-white'
                                                 }`}
                                             >
+                                                {/* Dot kecil atau Icon Child */}
+                                                <subItem.icon size={16} /> 
                                                 <span>{subItem.label}</span>
                                             </Link>
                                         </li>
@@ -90,25 +138,26 @@ const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (isOpen: b
                 );
             }
 
-            // Render logic untuk menu biasa & action button
-            const commonClasses = `flex items-center gap-3 p-3 my-1 rounded-md transition-all duration-200 ${
-    isParentActive 
-    ? 'bg-sidebar-active-bg text-sidebar-active-text font-bold shadow-sm' 
-    : 'text-sidebar-text/80 hover:bg-white/10 hover:text-white'
-} ${!isOpen && 'justify-center'}`;
-
+            // Render logic untuk menu biasa (Single)
             return (
-                <li key={item.label}>
+                <li key={item.label} className="mb-1">
                     {item.action ? (
                         <button
                             onClick={(e) => { e.preventDefault(); item.action?.(); }}
-                            className={`w-full ${commonClasses}`}
+                            className={`w-full flex items-center gap-3 p-3 rounded-md transition-all duration-200 hover:bg-white/10 ${!isOpen && 'justify-center'}`}
                         >
                             <item.icon size={20} className={item.label === 'Logout' ? 'text-red-400' : ''} />
                             <span className={!isOpen ? 'hidden' : 'block'}>{item.label}</span>
                         </button>
                     ) : (
-                        <Link href={item.href} className={commonClasses}>
+                        <Link 
+                            href={item.href} 
+                            className={`flex items-center gap-3 p-3 rounded-md transition-all duration-200 ${
+                                isSingleActive 
+                                ? 'bg-sky-600 text-white font-bold shadow-md' 
+                                : 'text-sidebar-text/80 hover:bg-white/10 hover:text-white'
+                            } ${!isOpen && 'justify-center'}`}
+                        >
                             <item.icon size={20} />
                             <span className={!isOpen ? 'hidden' : 'block'}>{item.label}</span>
                         </Link>
@@ -120,42 +169,42 @@ const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (isOpen: b
 
     return (
         <aside
-            className={`min-h-full bg-sidebar-bg text-sidebar-text flex flex-col transition-all duration-300
-                ${isOpen ? 'w-64' : 'w-20'}
-                fixed md:static z-40 h-full md:translate-x-0
+            className={`min-h-full bg-[#1e293b] text-white flex flex-col transition-all duration-300
+                ${isOpen ? 'w-72' : 'w-20'}
+                fixed md:static z-40 h-full md:translate-x-0 border-r border-gray-700
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
         >
-            <div className="flex-1 p-4">
+            <div className="flex-1 p-4 overflow-y-auto custom-scrollbar">
                 {/* Header dan Logo */}
                 <div className="flex items-center justify-center mb-8 relative h-14">
                     {isOpen && (
                         <Image
                             src="/Kab-Ponorogo.svg"
                             alt="Logo Kab Ponorogo"
-                            width={55}
-                            height={55}
+                            width={50}
+                            height={50}
                             className="transition-opacity duration-300"
                         />
                     )}
                     <button
                         onClick={() => setIsOpen(!isOpen)}
-                        className="p-2 text-gray-400 hover:text-white absolute right-0"
+                        className={`p-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white absolute ${isOpen ? 'right-0 top-0' : 'center'}`}
                     >
-                        {isOpen ? <PanelLeftClose /> : <PanelRightClose />}
+                        {isOpen ? <PanelLeftClose size={18} /> : <PanelRightClose size={20} />}
                     </button>
                 </div>
 
                 {/* Judul Aplikasi */}
                 {isOpen && (
-                    <div className="text-center mb-8">
-                        <h1 className="font-bold text-[15px] leading-tight">KINERJA PEMBANGUNAN DAERAH</h1>
-                        <p className="text-[15px]">Kabupaten Ponorogo</p>
+                    <div className="text-center mb-8 px-2">
+                        <h1 className="font-bold text-[14px] leading-tight tracking-wide text-white-400">KINERJA PEMBANGUNAN</h1>
+                        <p className="text-[12px] text-white-400 mt-1 uppercase tracking-widest">Kabupaten Ponorogo</p>
                     </div>
                 )}
                 
                 {/* Navigasi */}
                 <nav>
-                    <ul>
+                    <ul className="space-y-1">
                         {renderNavItems()}
                     </ul>
                 </nav>

@@ -5,8 +5,8 @@ import { FileText, Download } from 'lucide-react';
 import ContentContainer from '../../components/global/contentContainer';
 
 // 2. Import komponen layout
-import Sidebar from "@/src/components/global/Sidebar";
-import PageHeader from "@/src/components/global/Header";
+import Sidebar from "@/src/components/layout/Sidebar";
+import PageHeader from "@/src/components/layout/Header";
 import Breadcrumb from '@/src/components/global/Breadcrumb';
 
 const DashboardPage = () => {

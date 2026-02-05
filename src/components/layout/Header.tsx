@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import Cookies from "js-cookie";
-import { setCookie, getCookie } from "@/src/components/lib/Cookie";
-import { AlertNotification } from "./Alert";
+import { setCookie, getCookie } from "@/src/lib/cookie";
+import { AlertNotification } from "../global/Alert";
 import { usePathname } from "next/navigation";
 
 // JSON lokal

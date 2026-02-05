@@ -8,8 +8,8 @@ import PohonNode from '@/src/app/pohon-kinerja/_components/Pohon';
 import { PohonKinerja, TematikItem } from '@/src/app/pohon-kinerja/_types';
 
 // Import komponen layout
-import Sidebar from "@/src/components/global/Sidebar"; 
-import PageHeader from "@/src/components/global/Header"; 
+import Sidebar from "@/src/components/layout/Sidebar"; 
+import PageHeader from "@/src/components/layout/Header"; 
 import Breadcrumb from "@/src/components/global/Breadcrumb";
 
 // 1. PISAHKAN LOGIKA UTAMA KE DALAM KOMPONEN 'CONTENT'
