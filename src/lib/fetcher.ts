@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
 import { getCookie } from "cookies-next";
-import { getSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 
 interface ReqApi {
@@ -26,7 +25,7 @@ export async function fetchApi({
 
   const isFormData = body instanceof FormData;
 
-  const cookieToken = getCookie("auth") as string | undefined;
+  const cookieToken = getCookie("token") as string | undefined;
   const overrideToken = token || cookieToken;
 
   if (type === "auth") {
@@ -41,12 +40,6 @@ export async function fetchApi({
 
       if (overrideToken) {
         authToken = overrideToken;
-      } else if (typeof window === "undefined") {
-        // const session: any = await getServerSession(authOptions);
-        // authToken = session?.accessToken ?? null;
-      } else {
-        const session: any = await getSession();
-        authToken = session?.accessToken ?? null;
       }
 
       headers.append("Authorization", `Bearer ${authToken}`);

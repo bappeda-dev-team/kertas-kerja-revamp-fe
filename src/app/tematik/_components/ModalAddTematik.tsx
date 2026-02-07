@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { X, Plus, Trash2, Save } from "lucide-react";
 import { fetchApi } from "@/src/lib/fetcher";
 
 interface ModalAddTematikProps {
@@ -18,15 +17,15 @@ const ModalAddTematik: React.FC<ModalAddTematikProps> = ({
   // State Form
   const [namaTema, setNamaTema] = useState("");
   const [keterangan, setKeterangan] = useState("");
-  const [tahun, setTahun] = useState("2025");
+  const [tahun, setTahun] = useState("");
 
-  // Indikator (string aja, nanti dimapping)
-  const [indikators, setIndikators] = useState<string[]>([""]);
+  // Indikator
+  const [indikators, setIndikators] = useState<{ nama_indikator: string; target: string; satuan: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   // --- Logic Indikator ---
   const handleAddIndikator = () => {
-    setIndikators([...indikators, ""]);
+    setIndikators([...indikators, { nama_indikator: "", target: "", satuan: "" }]);
   };
 
   const handleRemoveIndikator = (index: number) => {
@@ -35,9 +34,9 @@ const ModalAddTematik: React.FC<ModalAddTematikProps> = ({
     setIndikators(list);
   };
 
-  const handleChangeIndikator = (value: string, index: number) => {
+  const handleChangeIndikator = (field: string, value: string, index: number) => {
     const list = [...indikators];
-    list[index] = value;
+    list[index] = { ...list[index], [field]: value };
     setIndikators(list);
   };
 
@@ -47,19 +46,18 @@ const ModalAddTematik: React.FC<ModalAddTematikProps> = ({
     setIsLoading(true);
 
     try {
-      // Mapping indikator ke format backend
       const formattedIndikators = indikators
-        .filter(i => i.trim() !== "")
-        .map((indikator) => ({
+        .filter(i => i.nama_indikator.trim() !== "")
+        .map((ind) => ({
           id: 0,
-          indikator: indikator,
+          indikator: ind.nama_indikator,
           keterangan: "",
           tahun: Number(tahun),
           targets: [
             {
               id: 0,
-              nilai: 0,
-              satuan: "",
+              nilai: Number(ind.target) || 0,
+              satuan: ind.satuan,
               tahun: Number(tahun)
             }
           ]
@@ -77,7 +75,6 @@ const ModalAddTematik: React.FC<ModalAddTematikProps> = ({
         indikators: formattedIndikators
       };
 
-
       console.log("Payload:", payload);
 
       const res = await fetchApi({
@@ -91,7 +88,8 @@ const ModalAddTematik: React.FC<ModalAddTematikProps> = ({
         alert("Data berhasil disimpan!");
         setNamaTema("");
         setKeterangan("");
-        setIndikators([""]);
+        setTahun("");
+        setIndikators([]);
         onSuccess();
         onClose();
       } else {
@@ -109,125 +107,153 @@ const ModalAddTematik: React.FC<ModalAddTematikProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto flex flex-col">
-        
-        {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-xl font-bold text-gray-800 uppercase">
-            Form Tambah Tematik Pemda
-          </h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full"
-          >
-            <X size={24} />
-          </button>
-        </div>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto"
+      onClick={onClose}
+    >
+      <div
+        className="border rounded-xl shadow-xl bg-white w-full max-w-4xl max-h-[90vh] overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-5 overflow-y-auto max-h-[90vh]">
+        <h1 className="uppercase font-bold">Form Tambah Tematik Pemda :</h1>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          
+        <form onSubmit={handleSubmit} className="flex flex-col mx-5 py-5">
           {/* Nama Tema */}
-          <div>
-            <label className="block text-xs font-bold mb-2">Nama Tema *</label>
+          <div className="flex flex-col py-3">
+            <label className="uppercase text-base font-bold text-gray-700 my-2">
+              Nama Tema :
+            </label>
             <input
               type="text"
               required
               value={namaTema}
               onChange={(e) => setNamaTema(e.target.value)}
+              placeholder="masukkan Nama Tema"
               className="w-full border rounded-lg px-4 py-3 text-sm"
             />
+            <span className="text-xs text-red-300 mt-1">*Nama Tema Harus Terisi</span>
           </div>
 
           {/* Keterangan */}
-          <div>
-            <label className="block text-xs font-bold mb-2">Keterangan *</label>
+          <div className="flex flex-col py-3">
+            <label className="uppercase text-base font-bold text-gray-700 my-2">
+              Keterangan :
+            </label>
             <textarea
               required
               rows={3}
               value={keterangan}
               onChange={(e) => setKeterangan(e.target.value)}
+              placeholder="masukkan Keterangan"
               className="w-full border rounded-lg px-4 py-3 text-sm"
             />
+            <span className="text-xs text-red-300 mt-1">*Keterangan Harus Terisi</span>
           </div>
 
           {/* Tahun */}
-          <div>
-            <label className="block text-xs font-bold mb-2">Tahun *</label>
+          <div className="flex flex-col py-3">
+            <label className="uppercase text-base font-bold text-gray-700 my-2">
+              Tahun:
+            </label>
             <select
+              required
               value={tahun}
               onChange={(e) => setTahun(e.target.value)}
               className="w-full border rounded-lg px-4 py-3 text-sm"
             >
-              {[2024,2025,2026,2027,2028,2029].map(t => (
+              <option value="" disabled>Masukkan tahun</option>
+              {[2024, 2025, 2026, 2027, 2028, 2029].map(t => (
                 <option key={t} value={t}>{t}</option>
               ))}
             </select>
+            <span className="text-xs text-red-300 mt-1">*tahun Harus Terisi</span>
           </div>
 
           {/* Indikator */}
-          <div className="border-t pt-4">
-            <label className="block text-xs font-bold mb-4">
-              Indikator Tematik
-            </label>
+          <label className="uppercase text-base font-bold text-gray-700 my-2">
+            indikator tematik :
+          </label>
 
-            {indikators.map((indikator, index) => (
-              <div key={index} className="flex gap-2 mb-2">
+          {indikators.map((indikator, index) => (
+            <div key={index} className="flex flex-col my-2 py-2 px-5 border rounded-lg">
+              {/* Nama Indikator */}
+              <div className="flex flex-col py-3">
+                <label className="uppercase text-xs font-bold text-gray-700 mb-2">
+                  Nama Indikator {index + 1} :
+                </label>
                 <input
                   type="text"
-                  value={indikator}
-                  onChange={(e) =>
-                    handleChangeIndikator(e.target.value, index)
-                  }
-                  className="flex-1 border rounded-lg px-4 py-2 text-sm"
-                  placeholder={`Indikator ${index + 1}`}
+                  value={indikator.nama_indikator}
+                  onChange={(e) => handleChangeIndikator("nama_indikator", e.target.value, index)}
+                  className="border px-4 py-2 rounded-lg"
+                  placeholder={`Masukkan nama indikator ${index + 1}`}
                 />
-                {indikators.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveIndikator(index)}
-                    className="text-red-500 border border-red-200 px-3 rounded"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                )}
               </div>
-            ))}
+              {/* Target */}
+              <div className="flex flex-col py-3">
+                <label className="uppercase text-xs font-bold text-gray-700 mb-2">
+                  Target :
+                </label>
+                <input
+                  type="text"
+                  value={indikator.target}
+                  onChange={(e) => handleChangeIndikator("target", e.target.value, index)}
+                  className="border px-4 py-2 rounded-lg"
+                  placeholder="Masukkan target"
+                />
+              </div>
+              {/* Satuan */}
+              <div className="flex flex-col py-3">
+                <label className="uppercase text-xs font-bold text-gray-700 mb-2">
+                  Satuan :
+                </label>
+                <input
+                  type="text"
+                  value={indikator.satuan}
+                  onChange={(e) => handleChangeIndikator("satuan", e.target.value, index)}
+                  className="border px-4 py-2 rounded-lg"
+                  placeholder="Masukkan satuan"
+                />
+              </div>
+              {/* Hapus */}
+              <button
+                type="button"
+                onClick={() => handleRemoveIndikator(index)}
+                className="px-3 flex justify-center items-center py-1 border-2 border-[#D20606] text-[#D20606] hover:bg-[#D20606] hover:text-white rounded-lg w-[200px] my-3"
+              >
+                Hapus
+              </button>
+            </div>
+          ))}
 
-            <button
-              type="button"
-              onClick={handleAddIndikator}
-              className="mt-3 w-full border-2 border-dashed py-2 rounded-lg text-blue-500"
-            >
-              <Plus size={16} /> Tambah Indikator
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={handleAddIndikator}
+            className="px-3 flex justify-center items-center py-1 border-2 border-[#3072D6] hover:bg-[#3072D6] text-[#3072D6] hover:text-white rounded-lg mb-3 mt-2 w-full"
+          >
+            Tambah Indikator
+          </button>
 
-          {/* Footer */}
-          <div className="flex flex-col gap-3 pt-4 border-t">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-green-500 text-white py-3 rounded-lg"
-            >
-              {isLoading ? "Menyimpan..." : (
-                <>
-                  <Save size={16} /> Simpan
-                </>
-              )}
-            </button>
+          {/* Simpan */}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="px-3 flex justify-center items-center py-1 bg-gradient-to-r from-[#1CE978] to-[#11B935] hover:from-[#1EB281] hover:to-[#0D7E5C] text-white rounded-lg my-4"
+          >
+            {isLoading ? "Menyimpan..." : "Simpan"}
+          </button>
 
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-full bg-red-500 text-white py-3 rounded-lg"
-            >
-              Kembali
-            </button>
-          </div>
-
+          {/* Kembali */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-3 flex justify-center items-center py-1 bg-gradient-to-r from-[#DA415B] to-[#B7384D] hover:from-[#B7384D] hover:to-[#951230] text-white rounded-lg"
+          >
+            Kembali
+          </button>
         </form>
+        </div>
       </div>
     </div>
   );

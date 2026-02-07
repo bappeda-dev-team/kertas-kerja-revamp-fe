@@ -1,5 +1,6 @@
 // types.ts
 
+
 export interface Target {
   id: number;
   nilai: number;
@@ -34,9 +35,12 @@ export interface PohonKinerja {
 export interface TematikItem {
     id: number;
     namaPohon: string;
+    tema: string;
+    keterangan: string;
     tahun: number;
     jenisPohon: string;
     status: string;
+    indikator: Indikator[];
 }
 
 export interface ApiResponse {

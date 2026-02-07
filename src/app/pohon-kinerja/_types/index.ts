@@ -30,12 +30,14 @@ export interface PohonKinerja {
   children: PohonKinerja[];
 }
 
-export interface TematikItem {
+interface TematikItem {
     id: number;
-    namaPohon: string;
-    tahun: number;
+    parentId: number | null;
+    tema: string;
     jenisPohon: string;
-    status: string;
+    levelPohon: number;
+    keterangan: string;
+    indikator: any[];
 }
 
 export interface ApiResponse {

@@ -20,7 +20,7 @@ const getHeaderStyle = (jenisPohon: string) => {
     case "TACTICAL_PEMDA": return "border-blue-500 text-white bg-gradient-to-r from-[#3673CA] from-40% to-[#08D2FB]";
     case "OPERATIONAL_PEMDA": return "border-green-500 text-white bg-gradient-to-r from-[#139052] from-40% to-[#2DCB06]";
     case "TEMATIK":
-    case "SUB_TEMATIK":
+    case "SUB_TEMATIK": 
     case "SUB_SUB_TEMATIK":
     case "SUPER_SUB_TEMATIK": return "border-black bg-white text-black";
     default: return "border-gray-300 bg-white text-gray-800";

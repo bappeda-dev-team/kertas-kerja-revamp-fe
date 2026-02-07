@@ -1,35 +1,47 @@
 "use client";
 
-import { useEffect, useState, Suspense } from 'react'; // Tambahkan Suspense
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { fetchApi } from '@/src/lib/fetcher';
 import './_styles/treeflex.css';
 import PohonNode from '@/src/app/pohon-kinerja/_components/Pohon';
-import { PohonKinerja, TematikItem } from '@/src/app/pohon-kinerja/_types';
+import { PohonKinerja } from '@/src/app/pohon-kinerja/_types';
 
-// Import komponen layout
 import Sidebar from "@/src/components/layout/Sidebar"; 
 import PageHeader from "@/src/components/layout/Header"; 
 import Breadcrumb from "@/src/components/global/Breadcrumb";
+import { TematikItem } from '../pohon-kinerja-opd/_types';
+import { getCookie } from '@/src/lib/cookie';
 
-// 1. PISAHKAN LOGIKA UTAMA KE DALAM KOMPONEN 'CONTENT'
 const PohonKinerjaContent = () => {
-    // Hooks untuk URL Params
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-    // State untuk Layout
     const [sidebarOpen, setSidebarOpen] = useState(true);
-
-    // State untuk Dropdown
     const [listTematik, setListTematik] = useState<TematikItem[]>([]);
     const [selectedId, setSelectedId] = useState<number | null>(null);
+    const [tahun, setTahun] = useState<number | null>(null);
 
-    // State untuk Tree Data
     const [treeData, setTreeData] = useState<PohonKinerja | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+
+    const getTahunFromCookie = (): number => {
+    try {
+        const tahunRaw = getCookie("tahun");
+        
+        if (tahunRaw) {
+            const parsedTahun = JSON.parse(tahunRaw as string);
+            return Number(parsedTahun.value || parsedTahun.tahun || new Date().getFullYear());
+        }
+        
+        return new Date().getFullYear();
+    } catch (error) {
+        console.warn("Gagal parsing cookie tahun, menggunakan default", error);
+        return new Date().getFullYear();
+    }
+};
 
     // LOGIC SINKRONISASI URL & STATE
     useEffect(() => {
@@ -55,18 +67,20 @@ const PohonKinerjaContent = () => {
         router.replace(`${pathname}?${params.toString()}`);
     };
 
-    // FETCH DATA TEMATIK
     useEffect(() => {
         const fetchTematikList = async () => {
+            const tahunCookie = getTahunFromCookie(); // ambil tahun terbaru dari cookie
+            
             try {
                 const res = await fetchApi({
                     type: "withoutAuth",
-                    url: "/pohon-kinerja/tematik",
+                    url: `/pohon-kinerja/tematik/${tahunCookie}`, // tahun dinamis
                     method: "GET"
                 });
 
-                if (res?.data?.success) {
-                    setListTematik(res.data.data);
+                if (res?.data?.success && res.data.data) {
+                    setListTematik(res.data.data.tematiks || []);
+                    setTahun(res.data.data.tahun || tahunCookie);
                 }
             } catch (err) {
                 console.error("Gagal load list tematik", err);
@@ -109,21 +123,16 @@ const PohonKinerjaContent = () => {
     }, [selectedId]); 
 
     return (
-        // Container Utama
         <div className="flex h-screen w-full bg-gray-100 overflow-hidden font-sans text-gray-800">
             
-            {/* SIDEBAR */}
             <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
-            {/* AREA KANAN */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
                 
-                {/* Header Container */}
                 <header className="p-4">
                     <PageHeader />
                 </header>
 
-                {/* Main Content Area */}
                 <main className="flex-1 overflow-y-auto p-4 md:p-6">
                     <Breadcrumb />
 
@@ -131,7 +140,7 @@ const PohonKinerjaContent = () => {
                     <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
                         <div className="flex flex-col items-center justify-center gap-3">
                             <h1 className="text-xl font-bold text-gray-800">
-                                Visualisasi Pohon Kinerja Pemda
+                                Visualisasi Pohon Kinerja Pemda {tahun && `(${tahun})`}
                             </h1>
                             <div className="flex flex-col sm:flex-row items-center gap-3 w-full max-w-md">
                                 <label className="text-sm font-semibold text-gray-600 whitespace-nowrap">
@@ -145,7 +154,7 @@ const PohonKinerjaContent = () => {
                                     <option value="" disabled>-- Pilih Tematik --</option>
                                     {listTematik.map((item) => (
                                         <option key={item.id} value={item.id}>
-                                            {item.namaPohon} ({item.tahun})
+                                            {item.tema}
                                         </option>
                                     ))}
                                 </select>
@@ -156,7 +165,6 @@ const PohonKinerjaContent = () => {
                     {/* Area Visualisasi Tree */}
                     <div className="w-full bg-white rounded-xl shadow-md border border-gray-200 p-4 min-h-[500px] overflow-x-auto">
                         
-                        {/* Loading State */}
                         {loading && (
                             <div className="flex items-center justify-center h-64 text-gray-500 animate-pulse">
                                 <div className="flex flex-col items-center gap-2">
@@ -166,21 +174,18 @@ const PohonKinerjaContent = () => {
                             </div>
                         )}
 
-                        {/* Error State */}
                         {error && (
                             <div className="flex items-center justify-center h-64 text-red-500 font-medium text-center">
                                 {error}
                             </div>
                         )}
 
-                        {/* Empty State (No Selection) */}
                         {!loading && !error && !selectedId && (
                             <div className="flex items-center justify-center h-64 text-blue-400 italic text-center">
                                 Silakan pilih tematik di atas untuk melihat pohon kinerja.
                             </div>
                         )}
 
-                        {/* Data Visualization */}
                         {!loading && !error && treeData && (
                             <div className="tf-tree tf-gap-lg flex justify-center items-start min-w-max mx-auto py-10">
                                 <ul>
@@ -195,7 +200,6 @@ const PohonKinerjaContent = () => {
     );
 };
 
-// 2. BUAT KOMPONEN PEMBUNGKUS (PAGE) DENGAN SUSPENSE
 const PohonKinerjaPage = () => {
     return (
         <Suspense fallback={

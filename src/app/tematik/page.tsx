@@ -9,36 +9,14 @@ import ModalEditTematik from "./_components/ModalEditTematik";
 import Breadcrumb from "@/src/components/global/Breadcrumb";
 import { fetchApi } from "@/src/lib/fetcher";
 import { getOpdTahun } from "@/src/lib/cookie";
-
-interface TargetItem {
-  id: number;
-  nilai: string;
-  satuan: string;
-}
-
-interface IndikatorItem {
-  id: number;
-  indikator: string;
-  keterangan: string;
-  targets: TargetItem[];
-}
-
-interface TematikItem {
-  id: number;
-  parentId: number | null;
-  tema: string;
-  jenisPohon: string;
-  levelPohon: number;
-  keterangan: string;
-  indikator: IndikatorItem[];
-}
+import { TematikItem } from "../pohon-kinerja-opd/_types";
 
 const TematikPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const [mounted, setMounted] = useState(false);
   const [dataTematik, setDataTematik] = useState<TematikItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [tahunData, setTahunData] = useState<number | null>(null);
 
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
@@ -166,9 +144,15 @@ const TematikPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {loading ? (
+                  {!selectedYear ? (
                     <tr>
-                      <td colSpan={5} className="text-center py-8 text-gray-400">
+                      <td colSpan={6} className="text-center py-8 text-gray-400">
+                        Pilih header terlebih dahulu
+                      </td>
+                    </tr>
+                  ) : loading ? (
+                    <tr>
+                      <td colSpan={6} className="text-center py-8 text-gray-400">
                         Memuat data...
                       </td>
                     </tr>
@@ -288,6 +272,7 @@ const TematikPage = () => {
         <ModalEditTematik
           isOpen={isEditModalOpen}
           data={selectedEditData}
+          tahunFromParent={tahunData ?? selectedYear}
           onClose={() => setIsEditModalOpen(false)}
           onSuccess={fetchData}
         />

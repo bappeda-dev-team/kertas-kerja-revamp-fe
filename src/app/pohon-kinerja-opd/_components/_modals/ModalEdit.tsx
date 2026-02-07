@@ -61,41 +61,16 @@ export const FormEditNode: React.FC<FormEditNodeProps> = ({ node, onCancel, onSu
     // Gunakan tahun dari props (Cookie) jika ada, jika tidak fallback ke node
     const activeTahun = tahun ? Number(tahun) : Number(node.tahun);
 
-    // Build Indikator Payload
-    const indikatorsPayload = indikators.map(ind => {
-      const targetObj: any = {
-        nilai: Number(ind.nilai), 
-        satuan: ind.satuan,
-        tahun: activeTahun
-      };
-      if (ind.targetId) targetObj.id = ind.targetId;
-
-      const indikatorObj: any = {
-        indikator: ind.indikator,
-        tahun: activeTahun,
-        targets: [targetObj]
-      };
-      if (ind.id) indikatorObj.id = ind.id;
-
-      return indikatorObj;
-    });
-
     const payload = {
-      // Pastikan semua field terisi
-      id: Number(node.id),
       parentId: node.parentId || null,
       namaPohon: formData.namaPohon,
       keterangan: formData.keterangan,
       tahun: activeTahun,
       jenisPohon: node.jenisPohon,
       levelPohon: Number(node.levelPohon),
-      status: "UPDATE", 
-      
-      // Data Konteks (Penting agar tidak hilang)
       kodeOpd: kodeOpd || node.kodeOpd || "",
       kodePemda: node.kodePemda || "",
-
-      indikators: indikatorsPayload
+      status: node.status || "DRAFT",
     };
 
     console.log("Payload Edit Final:", JSON.stringify(payload, null, 2));
@@ -123,70 +98,121 @@ export const FormEditNode: React.FC<FormEditNodeProps> = ({ node, onCancel, onSu
   };
 
   return (
-    <div className="bg-white border-2 border-gray-800 rounded-lg p-4 shadow-xl max-w-sm w-full relative text-left">
-      <h3 className="text-center font-bold text-sm uppercase mb-4 border-b pb-2">Edit {node.jenisPohon?.replace(/_/g, " ")}</h3>
+    <div className="bg-white border rounded-xl shadow-xl w-[384px] relative text-left p-5">
+      {/* Header */}
+      <h3 className="text-center font-bold text-sm uppercase border rounded-lg py-2 mb-4">
+        Edit {node.jenisPohon?.replace(/_/g, " ")}
+      </h3>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3 text-xs">
-        <div>
-          <label className="font-bold text-gray-500 block mb-1">Nama {node.jenisPohon}</label>
+      <form onSubmit={handleSubmit} className="flex flex-col">
+        {/* Nama Pohon */}
+        <div className="flex flex-col py-3">
+          <label className="uppercase text-xs font-bold text-gray-700 my-2">
+            {node.jenisPohon}
+          </label>
           <input
             type="text"
             name="namaPohon"
             value={formData.namaPohon}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+            className="border px-4 py-2 rounded-lg text-xs"
             required
           />
+          <h1 className="text-slate-300 text-xs mt-1">*nama pohon wajib terisi</h1>
         </div>
 
-        <div className="border border-blue-200 rounded p-2 bg-blue-50/50">
-          <label className="font-bold text-blue-600 block mb-2 text-center border-b border-blue-200 pb-1">INDIKATOR</label>
-          {indikators.map((ind, idx) => (
-            <div key={idx} className="mb-4 border-b border-gray-200 pb-2 last:border-0 last:pb-0">
-              <div className="mb-2">
-                <label className="text-[10px] font-semibold text-gray-500">Nama Indikator {idx + 1}</label>
+        {/* Indikator Section */}
+        <label className="uppercase text-base font-bold text-sky-700 my-2">
+          Indikator {node.jenisPohon} :
+        </label>
+
+        {indikators.length === 0 ? (
+          <p className="text-center text-gray-400 text-[11px] py-3">
+            Belum ada indikator
+          </p>
+        ) : (
+          indikators.map((ind, idx) => (
+            <div key={idx} className="flex flex-col my-2 py-2 px-5 border border-sky-700 rounded-lg">
+              <div className="flex flex-col py-1">
+                <label className="uppercase text-[10px] font-bold text-gray-700 mb-1 text-center">
+                  Nama Indikator {idx + 1} :
+                </label>
                 <input
                   type="text"
                   value={ind.indikator}
                   onChange={(e) => handleIndikatorChange(idx, "indikator", e.target.value)}
-                  className="w-full border border-gray-300 rounded p-1.5 focus:border-blue-500 outline-none"
+                  className="border px-4 py-2 rounded-lg text-xs"
                 />
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 py-1">
                 <div className="w-1/3">
-                  <label className="text-[10px] font-semibold text-gray-500">Target</label>
+                  <label className="uppercase text-[10px] font-bold text-gray-700 mb-1 block">Target</label>
                   <input
                     type="number"
                     value={ind.nilai}
                     onChange={(e) => handleIndikatorChange(idx, "nilai", e.target.value)}
-                    className="w-full border border-gray-300 rounded p-1.5 focus:border-blue-500 outline-none"
+                    className="w-full border px-4 py-2 rounded-lg text-xs"
                   />
                 </div>
                 <div className="w-2/3">
-                  <label className="text-[10px] font-semibold text-gray-500">Satuan</label>
+                  <label className="uppercase text-[10px] font-bold text-gray-700 mb-1 block">Satuan</label>
                   <input
                     type="text"
                     value={ind.satuan}
                     onChange={(e) => handleIndikatorChange(idx, "satuan", e.target.value)}
-                    className="w-full border border-gray-300 rounded p-1.5 focus:border-blue-500 outline-none"
+                    className="w-full border px-4 py-2 rounded-lg text-xs"
                   />
                 </div>
               </div>
-              <button type="button" onClick={() => removeIndikator(idx)} className="text-red-500 text-[10px] mt-1 hover:underline w-full text-right">Hapus Indikator</button>
+              <button
+                type="button"
+                onClick={() => removeIndikator(idx)}
+                className="px-3 py-1 border-2 border-[#D20606] text-[#D20606] hover:bg-[#D20606] hover:text-white rounded-lg w-[120px] text-[10px] font-semibold my-2"
+              >
+                Hapus
+              </button>
             </div>
-          ))}
-          <button type="button" onClick={addIndikator} className="w-full mt-2 border border-dashed border-blue-400 text-blue-600 rounded p-1 hover:bg-blue-50 transition">+ Tambah Indikator</button>
+          ))
+        )}
+
+        <button
+          type="button"
+          onClick={addIndikator}
+          className="px-3 flex justify-center items-center py-1 border-2 border-[#3072D6] hover:bg-[#3072D6] text-[#3072D6] hover:text-white rounded-lg gap-1 mb-3 mt-2 w-full text-xs font-bold transition"
+        >
+          Tambah Indikator
+        </button>
+
+        {/* Keterangan */}
+        <div className="flex flex-col pb-3 pt-1 border-t-2">
+          <label className="uppercase text-xs font-bold text-gray-700 my-2">
+            Keterangan :
+          </label>
+          <textarea
+            name="keterangan"
+            value={formData.keterangan}
+            onChange={handleChange}
+            rows={3}
+            className="border px-4 py-2 rounded-lg text-xs resize-none"
+          />
         </div>
 
-        <div>
-          <label className="font-bold text-gray-500 block mb-1">Keterangan</label>
-          <textarea name="keterangan" value={formData.keterangan} onChange={handleChange} rows={2} className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" />
-        </div>
-
-        <div className="flex gap-2 mt-2">
-          <button type="button" onClick={onCancel} disabled={loading} className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded font-bold transition disabled:opacity-50">Batal</button>
-          <button type="submit" disabled={loading} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-bold transition disabled:opacity-50">{loading ? "..." : "Simpan"}</button>
-        </div>
+        {/* Buttons */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="px-3 flex justify-center items-center py-1 bg-gradient-to-r from-[#08C2FF] to-[#006BFF] hover:from-[#0584AD] hover:to-[#014CB2] text-white rounded-lg w-full my-3 font-bold text-xs transition disabled:opacity-50"
+        >
+          {loading ? "Menyimpan..." : "Simpan"}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={loading}
+          className="px-3 flex justify-center items-center py-1 bg-gradient-to-r from-[#DA415B] to-[#BC163C] hover:from-[#B7384D] hover:to-[#951230] text-white rounded-lg w-full font-bold text-xs transition disabled:opacity-50"
+        >
+          Batal
+        </button>
       </form>
     </div>
   );

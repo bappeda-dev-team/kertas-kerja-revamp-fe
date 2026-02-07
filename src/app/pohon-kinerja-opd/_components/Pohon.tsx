@@ -6,7 +6,7 @@ import { PohonKinerja, Indikator } from "@/src/app/pohon-kinerja-opd/_types";
 import { getChildInfo, getPohonStyle } from "@/src/app/pohon-kinerja-opd/_utils";
 import { FormAddChildModal } from "@/src/app/pohon-kinerja-opd/_components/_modals/ModalAdd";
 import { FormEditNode } from "@/src/app/pohon-kinerja-opd/_components/_modals/ModalEdit";
-import { getCookie } from "@/src/components/lib/Cookie";
+import { getCookie } from "@/src/lib/cookie";
 
 interface PohonNodeOpdProps {
   node: PohonKinerja;
@@ -40,12 +40,10 @@ const PohonNodeOpd: React.FC<PohonNodeOpdProps> = ({ node, onTreeRefresh, onDele
   const hasChildren = node.children && node.children.length > 0;
 
   // State
-  const [isExpanded, setIsExpanded] = useState(true); 
+  const [isExpanded, setIsExpanded] = useState(false); 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  // --- LOGIC: AMBIL DATA DARI COOKIE ---
-  // Fungsi helper untuk parsing cookie json string aman
   const getContextFromCookie = () => {
     try {
       const opdRaw = getCookie("opd");
